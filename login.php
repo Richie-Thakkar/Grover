@@ -1,8 +1,98 @@
 <?php
-error_reporting(0);
 @include 'config.php';
 require_once 'vendor/autoload.php';
 session_start();
+if (isset($_POST['fp'])) {
+  ?>
+  <script>
+    let email = prompt("Enter your email address");
+    let expirationTime = new Date();
+    expirationTime.setTime(expirationTime.getTime() + (15 * 60 * 1000)); 
+    let expires = "expires=" + expirationTime.toUTCString();
+    document.cookie = "email=" + encodeURIComponent(email) + ";" + expires + ";path=/";
+  </script>
+  <?php
+    if (isset($_COOKIE['email'])) {
+      $em = filter_var($_COOKIE['email']);
+      $findem = "SELECT * FROM `users` WHERE email = ? AND token IS NULL";
+      $stmt = $conn->prepare($findem);
+      $stmt->execute([$em]);
+      $rowCount = $stmt->rowCount();
+      $row = $stmt->fetch(PDO::FETCH_ASSOC);
+      if ($rowCount > 0) {
+        $otp = substr(bin2hex(random_bytes(4)), 0, 7);
+        $curl = curl_init();
+  
+        curl_setopt_array($curl, [
+          CURLOPT_URL => "https://rapidprod-sendgrid-v1.p.rapidapi.com/mail/send",
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => "",
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 30,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => "POST",
+          CURLOPT_POSTFIELDS => json_encode([
+            'personalizations' => [
+              [
+                'to' => [
+                  [
+                    'email' => $em
+                  ]
+                ],
+                'subject' => 'Otp'
+              ]
+            ],
+            'from' => [
+              'email' => 'richiethakkar@gmail.com'
+            ],
+            'content' => [
+              [
+                'type' => 'text/plain',
+                'value' => $otp
+              ]
+            ]
+          ]),
+          CURLOPT_HTTPHEADER => [
+            "X-RapidAPI-Host: rapidprod-sendgrid-v1.p.rapidapi.com",
+            "X-RapidAPI-Key: 9eabe601b6msh1ea06cb8d54a0d4p15c5ffjsn511bfb4c034f",
+            "content-type: application/json"
+          ],
+        ]);
+  
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+  
+        curl_close($curl);
+  
+        if ($err) {
+          echo "cURL Error #:" . $err;
+        } else {
+          echo "<script>console.log(" . json_encode($response) . ")</script>";
+        }
+  ?>
+  <script>
+    let delayTime = 5000; // Delay in milliseconds
+    setTimeout(() => {
+      let otp = prompt("Enter the OTP sent to your email address");
+      if (otp !== null) {
+        let expirationTime = new Date();
+        expirationTime.setTime(expirationTime.getTime() + (15 * 60 * 1000)); // 15 minutes in milliseconds
+        let expires = "expires=" + expirationTime.toUTCString();
+        document.cookie = "otp=" + encodeURIComponent(otp) + ";" + expires + ";path=/";
+        window.location.href = "forgotpass.php"; // Redirect to forgotpass.php after prompt
+      } else {
+        alert("OTP input cancelled.");
+      }
+    }, delayTime);
+  </script>
+  <?php
+      } else {
+        echo "<script>alert('Entered email address is not registered with us')</script>";
+      }
+    }
+  }
+    
+  
 if(isset($_POST['submit'])){
    
    $email = $_POST['email'];
@@ -102,12 +192,18 @@ if (isset($_SESSION['user_token'])) {
         <input type="password" id="password" name="password" required>
       </label>
       <button class="submit" id="b" value="login now" name="submit" type="submit" >Sign In</button>
-      <h4 align=center>OR</h4><br>      
+           
 </form>
       <?php
-echo "<div style='display:flex;justify-content:center;'><a href='" . $client->createAuthUrl() . "'><img src='https://cdn.pixabay.com/photo/2015/12/11/11/43/google-1088004__340.png' style='width:25px';></a></div>"; 
+echo "<div style='display:flex;justify-content:center;'>Sign in with &nbsp;<a href='" . $client->createAuthUrl() . "'><img src='https://cdn.pixabay.com/photo/2015/12/11/11/43/google-1088004__340.png' style='width:25px';></a></div>"; 
 }
       ?>
+      <form style="text-align:center;margin-top:5px;" method="POST">
+      <button class="submit" name="fp" >Forgot Password</button>    
+      </form>
+        <div style="text-align:center;margin-top:5px;">
+      <p>Please note that first time users will not directly be redirected to the web page on using google sign in. They have to login again through google sign in</p>   
+      </div>
     </div>
 
     <div class="sub-cont">
@@ -149,9 +245,66 @@ echo "<div style='display:flex;justify-content:center;'><a href='" . $client->cr
       </div>
     </div>
   </div>
+  <div class="login-wrap">
+  <div class="login-html">
+    <input id="tab-1" type="radio" name="tab" class="sign-in" checked><label for="tab-1" class="tab">Sign In</label>
+    <input id="tab-2" type="radio" name="tab" class="sign-up"><label for="tab-2" class="tab">Sign Up</label>
+    <div class="login-form">
+      <form action="" class="sign-in-htm" method="POST">
+        <div class="group">
+          <label for="user" class="label">Email Address</label>
+          <input id="user" type="text" name="email" class="input">
+        </div>
+        <div class="group">
+          <label for="pass" class="label">Password</label>
+          <input id="pass" type="password" name="password" class="input" data-type="password">
+        </div>
+        <div class="group">
+          <input type="submit" class="button" name="submit" value="Sign In">
+        </div>
+        <div class="group">
+        <?php
+echo "<div style='display:flex;justify-content:center;'>Sign in with &nbsp;<a href='" . $client->createAuthUrl() . "'><img src='https://cdn.pixabay.com/photo/2015/12/11/11/43/google-1088004__340.png' style='width:25px';></a></div>"; 
+?>
+        </div>
+        <div class="group" style="text-align:center;">
+        <a href="#forgot" style="color:blue;">Forgot Password?</a>
+        </div>
+        <div class="hr"></div>
+        <div class="foot-lnk">
+          
+        <p>Please note that first time users will not directly be redirected to the web page on using google sign in. They have to login again through google sign in</P>
+        </div>
+</form>
+      <form action="" class="sign-up-htm" method="POST">
+        <div class="group">
+          <label for="user" class="label">Name</label>
+          <input id="user" type="text" name="name" class="input">
+        </div>
+        <div class="group">
+          <label for="pass" class="label">Password</label>
+          <input id="pass" type="password"  name="pass" class="input" data-type="password">
+        </div>
+        <div class="group">
+          <label for="pass" class="label">Repeat Password</label>
+          <input id="pass" type="password" name="cpass" class="input" data-type="password">
+        </div>
+        <div class="group">
+          <label for="pass" class="label">Email Address</label>
+          <input id="pass" type="text" name="email" class="input">
+        </div>
+        <div class="group">
+          <input type="submit" class="button" name="submit-reg" value="Sign Up">
+        </div>
+        <div class="hr"></div>
+        <div class="foot-lnk">
+          <label for="tab-1">Already Member?</a>
+        </div>
+</form>
+    </div>
+  </div>
+</div>
 <script type="text/javascript" src="js/s.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8"crossorigin="anonymous"></script>
 </body>
 </html>
-
-

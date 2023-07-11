@@ -12,6 +12,8 @@ if (isset($_GET['code'])) {
    if(!isset($_SESSION['user_id']))
    {
    $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
+   if(!isset($token['access_token']))
+   header('location:login.php');
    $client->setAccessToken($token['access_token']);
    // get profile info
    $google_oauth = new Google_Service_Oauth2($client);
@@ -244,7 +246,7 @@ if(isset($_POST['add_to_cart'])){
       <div class="content">
          <span>Worth Relying on Us</span>
          <h3>Reach For A Healthier You With Organic Foods</h3>
-         <p>At Grover, we assure you the finest quality of fruits, veggies and groceries delivered to you in less than 30 minutes....Grockety Promise :-)</p>
+         <p>At Grover, we assure you the finest quality of fruits, veggies and groceries delivered to you in less than 30 minutes....Grokety Promise :-)</p>
          <a href="about.php" class="btn">about us</a>
       </div>
 
@@ -261,21 +263,21 @@ if(isset($_POST['add_to_cart'])){
       <div class="box" style="height:500px;">
          <img src="images/cat-1.png" style="height:200px;" alt="fruits">
          <h3>Fruits</h3>
-         <p>We at grover assure you the best quality organic fruits delivered straight from farm to your home</p>
+         <p>We at Grover assure you the best quality organic fruits delivered straight from farm to your home</p>
          <a href="category.php?category=fruits" class="btn">Fruits</a>
       </div>
 
       <div class="box" style="height:500px;">
          <img src="images/cat-2.png" style="height:200px;" alt="meat">
          <h3>Meat</h3>
-         <p>Meat processed to perfection available only at grover. Meat goes through a variety of before recahing you </p>
+         <p>Meat processed to perfection available only at Grover. Meat goes through a variety of before recahing you </p>
          <a href="category.php?category=meat" class="btn">Meat</a>
       </div>
 
       <div class="box" style="height:500px;">
          <img src="images/cat-3.png " style="height:200px;" alt="vegetables">
          <h3>Vegetables</h3>
-         <p>We at grover assure you the best quality organic vegetables delivered straight from farm to your home</p>
+         <p>We at Grover assure you the best quality organic vegetables delivered straight from farm to your home</p>
          <a href="category.php?category=vegitables" class="btn">Vegetables</a>
       </div>
 
@@ -327,7 +329,7 @@ if(isset($_POST['add_to_cart'])){
 </section>
 <section class="home-category">
 <h1 class="title">Some motivation to keep you fresh just like our products</h1><br>
-<p style="font-family:'Rubik', sans-serif;font-size:27px;text-align:center"><i><?=$response1['text']?></i></p>
+<p style="font-family:'Rubik', sans-serif;font-size:27px;text-align:center"><i><?= isset($response1['text']) ? $response1['text'] : 'An Apple a day keeps a doctor away';?></i></p>
 </section>
 <section class="home-category">
 <h1 class="title">Recipe of the day</h1><br>

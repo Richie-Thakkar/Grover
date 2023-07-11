@@ -19,8 +19,8 @@
          <h3>follow us</h3>
          <a href="https://www.facebook.com/Bigbasketcom/" target="_blank"> <i class="fab fa-facebook-f"></i> facebook </a>
          <a href="https://twitter.com/bigbasket_com?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor" target="_blank"> <i class="fab fa-twitter"></i> twitter </a>
-         <a href="https://www.instagram.com/bigbasketcom/?hl=en"> <i class="fab fa-instagram" target="_blank"></i> instagram </a>
-         <a href="https://in.linkedin.com/company/bigbasket-com"> <i class="fab fa-linkedin" target="_blank"></i> linkedin </a>
+         <a href="https://www.instagram.com/bigbasketcom/?hl=en" target="_blank"> <i class="fab fa-instagram" ></i> instagram </a>
+         <a href="https://in.linkedin.com/company/bigbasket-com" target="_blank"> <i class="fab fa-linkedin"></i> linkedin </a>
       </div>
 
    </section>
