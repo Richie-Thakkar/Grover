@@ -1,4 +1,3 @@
-# Grover
 ![image](https://github.com/Richie-Thakkar/Grover/assets/91325143/5729ea3d-3422-4328-87d6-88ebba54e311)
 
 ## Introduction:
